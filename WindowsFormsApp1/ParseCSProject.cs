@@ -10,8 +10,6 @@ using System.Text;
 
 namespace WindowsFormsApp1
 {
-   
-
     internal class ParseCSProject
     {
         internal void Start(string path_csproj)
@@ -101,7 +99,10 @@ namespace WindowsFormsApp1
                     myns._types.Add(type);
                 }
 
-                string all = File.ReadAllText("template.js", Encoding.UTF8);
+                string all = WindowsFormsApp1.Properties.Resource1.template;
+
+
+
 
                 aa.init_sb();
                 root._01_make_namespace_and_class();
