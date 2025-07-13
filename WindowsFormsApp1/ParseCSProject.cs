@@ -55,7 +55,7 @@ namespace WindowsFormsApp1
             if (!File.Exists(path))
             {
                 return;
-            }       
+            }
 
             MyNameSpace root = new MyNameSpace();
             root._FullNameSpace = RootNamespace;
@@ -99,10 +99,7 @@ namespace WindowsFormsApp1
                     myns._types.Add(type);
                 }
 
-                string all = WindowsFormsApp1.Properties.Resource1.template;
-
-
-
+                string all = get_template();
 
                 aa.init_sb();
                 root._01_make_namespace_and_class();
@@ -197,6 +194,48 @@ namespace WindowsFormsApp1
         }
 
 
+        string get_template()
+        {
 
+            string rtn = @"run();
+
+function run() {  
+   //https://members.change-vision.com/javadoc/astah-api/10_1_0/api/ja/doc/javadoc/index.html
+   //TransactionManagerとかはcom.change_vision.jude.api.inf.editor名前空間に属する。   
+    with (new JavaImporter(com.change_vision.jude.api.inf.editor)) {
+        
+     // トランザクションの開始
+    TransactionManager.beginTransaction();
+
+        //単なる取得
+        var myClassDiagrmaEditor = astah.getDiagramEditorFactory().getClassDiagramEditor();       
+        
+        //現在開いているプロジェクトを取得(プロジェクト=拡張子astaである保存ファイル、ファイルにはプロジェクトが１つだけ含まれる)
+        //プロジェクト（ファイル）を開いていない場合エラーとなる。
+        //https://members.change-vision.com/javadoc/astah-api/10_1_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/project/ProjectAccessor.html#getProject()
+        var myProject = astah.getProject();  //myProjectは、IModel型らしい。        
+                 
+        //単なる取得
+        //https://members.change-vision.com/javadoc/astah-api/10_1_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/editor/BasicModelEditor.html#createClass(com.change_vision.jude.api.inf.model.IPackage,java.lang.String)
+         var myBasicModelEditor = astah.getModelEditorFactory().getBasicModelEditor();
+
+        //プロジェクトに言語情報をセットする。
+        myBasicModelEditor.setLanguageCSharp(myProject,true);       
+
+        //パッケージ（プロジェクト）にパッケージ（名前空間）を追加する。
+        //var myNameSpace1=myBasicModelEditor.createPackage(myProject,""namespace1"");
+        //makeClass(myNameSpace1);
+//namespace_and_class
+//filed
+        //トランザクションの終了
+        TransactionManager.endTransaction();
+    } 
+}";
+
+            return rtn;
+        }
     }
+
+   
+
 }
