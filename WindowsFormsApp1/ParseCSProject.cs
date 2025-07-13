@@ -72,6 +72,11 @@ namespace WindowsFormsApp1
                         continue;
                     }
 
+                    if (type.FullName.Contains(".Properties."))
+                    {
+                        continue;
+                    }
+
                     string[] strs = type.Namespace.Split('.');
                     MyNameSpace myns = root.SearchNameSpace(type.Namespace);
                     if (myns == null)

@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
-   
-
     internal class MyNameSpace
     {
         internal string _Name = "";
@@ -17,7 +15,6 @@ namespace WindowsFormsApp1
         internal List<TypeDefinition> _types = new List<TypeDefinition>();
         internal List<MyNameSpace> _childs = new List<MyNameSpace>();
         internal MyNameSpace _parent = null;
-
 
         internal void _01_make_namespace_and_class()
         {
@@ -72,9 +69,54 @@ namespace WindowsFormsApp1
 
         string get_var_field(FieldDefinition field)//参照することはないかもしれない
         {
-            string fullname = field.DeclaringType.Namespace.Replace(".", "") + "_" + field.DeclaringType.Name;
+            string fullname = field.DeclaringType.Namespace.Replace(".", "") + "_" +
+                field.DeclaringType.Name;
             string var_field = $"f_{fullname}_{field.Name}";
             return var_field;
+        }
+
+        string get_var_field(PropertyDefinition pro)//参照することはないかもしれない
+        {
+            string fullname = pro.DeclaringType.Namespace.Replace(".", "") + "_" +
+                pro.DeclaringType.Name;
+            string var_field = $"p_{fullname}_{pro.Name}";
+            return var_field;
+        }
+
+
+        string get_typename(string arg,TypeReference type)
+        {
+            string typeName = arg;
+            switch (typeName)
+            {
+                case "Byte": typeName = "\"byte\""; break;
+                case "SByte": typeName = "\"sbyte\""; break;
+                case "Int16": typeName = "\"short\""; break;
+                case "UInt16": typeName = "\"ushort\""; break;
+                case "Int32": typeName = "\"int\""; break;
+                case "UInt32": typeName = "\"uint\""; break;
+                case "Int64": typeName = "\"long\""; break;
+                case "UInt64": typeName = "\"ulong\""; break;
+                case "String": typeName = "\"string\""; break;
+                case "Char": typeName = "\"char\""; break;
+                case "Boolean": typeName = "\"bool\""; break;
+                case "Single": typeName = "\"float\""; break;
+                case "Double": typeName = "\"double\""; break;
+                case "Object": typeName = "\"object\""; break;
+
+                default:
+                    //このアセンブリ内の自作クラスの場合はよいが
+                    typeName = get_var_class(type);
+                    if (!aa.dicClasses.ContainsKey(typeName))
+                    {
+                        //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
+                        typeName = $"\"{type.Name}\"";
+                    }
+                    break;
+            }
+
+
+            return typeName;
         }
 
         void make_filed(TypeDefinition type)
@@ -82,97 +124,90 @@ namespace WindowsFormsApp1
             string temp = "";
             string var_class_name = get_var_class(type);
 
-            foreach (var field in type.Fields)
+            if (true)
             {
-                if (field.Name.EndsWith("k__BackingField"))
+                foreach (var field in type.Fields)
                 {
-                    continue;
-                }
+                    if (field.Name.EndsWith("k__BackingField"))
+                    {
+                        continue;
+                    }
 
-                string typeName = field.FieldType.Name;
-                switch (typeName)
+                    string typeName = get_typename(field.FieldType.Name, field.FieldType);
+                    string name_field = get_var_field(field);
+
+                    temp =
+                    $"var {name_field} = myBasicModelEditor.createAttribute(" +
+                    $"{var_class_name},\"{field.Name}\",{typeName}); ";
+
+                    aa.append(temp);
+                }
+            }
+
+
+            foreach (PropertyDefinition pro in type.Properties)
+            {
+                string var_name = get_var_field(pro);
+
+                TypeReference typeReference = pro.PropertyType;
+
+
+                string kata = get_typename(typeReference.Name, typeReference);
+
+                if (typeReference is GenericInstanceType)
                 {
-                    case "SByte": typeName = "\"sbyte\""; break;
-                    case "Byte": typeName = "\"byte\""; break;
-                    case "Short": typeName = "\"short\""; break;
-                    case "UInt16": typeName = "\"ushort\""; break;
-                    case "Int32": typeName = "\"int\""; break;
-                    case "UInt32": typeName = "\"uint\""; break;
-                    case "Int64": typeName = "\"long\""; break;
-                    case "UInt64": typeName = "\"ulong\""; break;
-                    case "String": typeName = "\"string\""; break;
-                    case "Char": typeName = "\"char\""; break;
-                    case "Boolean": typeName = "\"bool\""; break;
-                    case "Single": typeName = "\"float\""; break;
-                    case "Double": typeName = "\"double\""; break;
-                    case "Object": typeName = "\"object\""; break;
+                    GenericInstanceType gene = typeReference as GenericInstanceType;
 
-                    default:
-                        //このアセンブリ内の自作クラスの場合はよいが
-                        typeName = get_var_class(field.FieldType);
-                        if (!aa.dicClasses.ContainsKey(typeName))
-                        {
-                            //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
-                            typeName = $"\"{field.FieldType.Name}\"";
-                        }
-                        break;
+                    string name = gene.Name.Substring(0, gene.Name.IndexOf('`'));//ReactiveProperty`1
+
+                    var ss = gene.GenericArguments.Select(n => n.Name)
+                        .Aggregate((a, b) => a + "," + b);
+
+                    kata = $"\"{name}<{ss}>\"";
                 }
-
-                string name_field = get_var_field(field);
-
 
                 temp =
-                $"var {name_field} = myBasicModelEditor.createAttribute(" +
-                $"{var_class_name},\"{field.Name}\",{typeName}); ";
+                    $"var {var_name} = myBasicModelEditor.createAttribute(" +
+                    $"{var_class_name},\"{pro.Name}\",{kata}); ";
+                aa.append(temp);
 
 
+                temp = $"{var_name}.setVisibility(\"public\");";
+                aa.append(temp);
 
-
-
+                temp = $"{var_name}.addStereotype(\"property\");";
                 aa.append(temp);
             }
+
+
+
 
 
             //Console.WriteLine("------------プロパティ------------");
             //foreach (var property in type.Properties)
             //{
             //    TypeReference typeReference = property.PropertyType;
-            //    string kata = typeReference.Name;
-            //    if (typeReference is GenericInstanceType)
-            //    {
-            //        GenericInstanceType gene = typeReference as GenericInstanceType;
+            
 
-            //        string name = gene.Name.Substring(0, gene.Name.IndexOf('`'));//ReactiveProperty`1
+                //Console.WriteLine("------------メソッド------------");
+                //foreach (var method in type.Methods)
+                //{
+                //    if (method.Name.StartsWith("get_") || method.Name.StartsWith("set_"))
+                //    {
+                //        continue;
+                //    }
+                //    //明示的な宣言があろうがなかろうが.ctorは存在する。
+                //    if (method.Name.Contains(".ctor") || method.Name.Contains(".cctor"))
+                //    {
+                //        continue;
+                //    }
 
-            //        var ss = gene.GenericArguments.Select(n => n.Name)
-            //            .Aggregate((a, b) => a + "," + b);
-
-            //        kata = $"{name}<{ss}>";
-            //        { }
-            //    }
-
-            //    Console.WriteLine($"{kata}:{property.Name}");
-            //}
-
-            //Console.WriteLine("------------メソッド------------");
-            //foreach (var method in type.Methods)
-            //{
-            //    if (method.Name.StartsWith("get_") || method.Name.StartsWith("set_"))
-            //    {
-            //        continue;
-            //    }
-            //    //明示的な宣言があろうがなかろうが.ctorは存在する。
-            //    if (method.Name.Contains(".ctor") || method.Name.Contains(".cctor"))
-            //    {
-            //        continue;
-            //    }
-
-            //    MethodAttributes att = method.Attributes;
-            //    att = att & ~MethodAttributes.HideBySig;
-            //    string sss = att.ToString().Replace("CompilerControlled, ", "");
-            //    Console.WriteLine(
-            //        $"{sss} {method.ReturnType.Name} {method.Name}");
-            //}
+                //    MethodAttributes att = method.Attributes;
+                //    att = att & ~MethodAttributes.HideBySig;
+                //    string sss = att.ToString().Replace("CompilerControlled, ", "");
+                //    Console.WriteLine(
+                //        $"{sss} {method.ReturnType.Name} {method.Name}");
+                //}
         }
 
         public override string ToString()
