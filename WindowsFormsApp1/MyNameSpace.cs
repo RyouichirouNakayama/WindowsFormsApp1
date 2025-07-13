@@ -114,8 +114,6 @@ namespace WindowsFormsApp1
                     }
                     break;
             }
-
-
             return typeName;
         }
 
@@ -144,7 +142,6 @@ namespace WindowsFormsApp1
                 }
             }
 
-
             foreach (PropertyDefinition pro in type.Properties)
             {
                 string var_name = get_var_field(pro);
@@ -166,11 +163,9 @@ namespace WindowsFormsApp1
                     kata = $"\"{name}<{ss}>\"";
                 }
 
-                temp =
-                    $"var {var_name} = myBasicModelEditor.createAttribute(" +
+                temp = $"var {var_name} = myBasicModelEditor.createAttribute(" +
                     $"{var_class_name},\"{pro.Name}\",{kata}); ";
                 aa.append(temp);
-
 
                 temp = $"{var_name}.setVisibility(\"public\");";
                 aa.append(temp);
@@ -179,35 +174,25 @@ namespace WindowsFormsApp1
                 aa.append(temp);
             }
 
-
-
-
-
-            //Console.WriteLine("------------プロパティ------------");
-            //foreach (var property in type.Properties)
+            //Console.WriteLine("------------メソッド------------");
+            //foreach (var method in type.Methods)
             //{
-            //    TypeReference typeReference = property.PropertyType;
-            
+            //    if (method.Name.StartsWith("get_") || method.Name.StartsWith("set_"))
+            //    {
+            //        continue;
+            //    }
+            //    //明示的な宣言があろうがなかろうが.ctorは存在する。
+            //    if (method.Name.Contains(".ctor") || method.Name.Contains(".cctor"))
+            //    {
+            //        continue;
+            //    }
 
-                //Console.WriteLine("------------メソッド------------");
-                //foreach (var method in type.Methods)
-                //{
-                //    if (method.Name.StartsWith("get_") || method.Name.StartsWith("set_"))
-                //    {
-                //        continue;
-                //    }
-                //    //明示的な宣言があろうがなかろうが.ctorは存在する。
-                //    if (method.Name.Contains(".ctor") || method.Name.Contains(".cctor"))
-                //    {
-                //        continue;
-                //    }
-
-                //    MethodAttributes att = method.Attributes;
-                //    att = att & ~MethodAttributes.HideBySig;
-                //    string sss = att.ToString().Replace("CompilerControlled, ", "");
-                //    Console.WriteLine(
-                //        $"{sss} {method.ReturnType.Name} {method.Name}");
-                //}
+            //    MethodAttributes att = method.Attributes;
+            //    att = att & ~MethodAttributes.HideBySig;
+            //    string sss = att.ToString().Replace("CompilerControlled, ", "");
+            //    Console.WriteLine(
+            //        $"{sss} {method.ReturnType.Name} {method.Name}");
+            //}
         }
 
         public override string ToString()
