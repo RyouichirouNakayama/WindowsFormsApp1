@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+//テンプレートクラスを指定させるのは無理らしい。
+//そこで..
+
 namespace WindowsFormsApp1
 {
     internal class MyNameSpace
@@ -86,34 +89,46 @@ namespace WindowsFormsApp1
 
         string get_typename(string arg,TypeReference type)
         {
-            string typeName = arg;
-            switch (typeName)
-            {
-                case "Byte": typeName = "\"byte\""; break;
-                case "SByte": typeName = "\"sbyte\""; break;
-                case "Int16": typeName = "\"short\""; break;
-                case "UInt16": typeName = "\"ushort\""; break;
-                case "Int32": typeName = "\"int\""; break;
-                case "UInt32": typeName = "\"uint\""; break;
-                case "Int64": typeName = "\"long\""; break;
-                case "UInt64": typeName = "\"ulong\""; break;
-                case "String": typeName = "\"string\""; break;
-                case "Char": typeName = "\"char\""; break;
-                case "Boolean": typeName = "\"bool\""; break;
-                case "Single": typeName = "\"float\""; break;
-                case "Double": typeName = "\"double\""; break;
-                case "Object": typeName = "\"object\""; break;
 
-                default:
-                    //このアセンブリ内の自作クラスの場合はよいが
-                    typeName = get_var_class(type);
-                    if (!aa.dicClasses.ContainsKey(typeName))
-                    {
-                        //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
-                        typeName = $"\"{type.Name}\"";
-                    }
-                    break;
+
+
+
+            string typeName = arg;
+            typeName = get_var_class(type);
+            if (!aa.dicClasses.ContainsKey(typeName))
+            {
+                //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
+                typeName = $"\"{type.Name}\"";
             }
+
+
+            //switch (typeName)
+            //{
+            //    case "Byte": typeName = "\"byte\""; break;
+            //    case "SByte": typeName = "\"sbyte\""; break;
+            //    case "Int16": typeName = "\"short\""; break;
+            //    case "UInt16": typeName = "\"ushort\""; break;
+            //    case "Int32": typeName = "\"int\""; break;
+            //    case "UInt32": typeName = "\"uint\""; break;
+            //    case "Int64": typeName = "\"long\""; break;
+            //    case "UInt64": typeName = "\"ulong\""; break;
+            //    case "String": typeName = "\"string\""; break;
+            //    case "Char": typeName = "\"char\""; break;
+            //    case "Boolean": typeName = "\"bool\""; break;
+            //    case "Single": typeName = "\"float\""; break;
+            //    case "Double": typeName = "\"double\""; break;
+            //    case "Object": typeName = "\"object\""; break;
+
+            //    default:
+            //        //このアセンブリ内の自作クラスの場合はよいが
+            //        typeName = get_var_class(type);
+            //        if (!aa.dicClasses.ContainsKey(typeName))
+            //        {
+            //            //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
+            //            typeName = $"\"{type.Name}\"";
+            //        }
+            //        break;
+            //}
             return typeName;
         }
 
@@ -148,14 +163,14 @@ namespace WindowsFormsApp1
 
                 TypeReference typeReference = pro.PropertyType;
 
-
                 string kata = get_typename(typeReference.Name, typeReference);
 
                 if (typeReference is GenericInstanceType)
                 {
                     GenericInstanceType gene = typeReference as GenericInstanceType;
 
-                    string name = gene.Name.Substring(0, gene.Name.IndexOf('`'));//ReactiveProperty`1
+                    string name = gene.Name.Substring(0, gene.Name.IndexOf('`'));
+                    //ReactiveProperty`1
 
                     var ss = gene.GenericArguments.Select(n => n.Name)
                         .Aggregate((a, b) => a + "," + b);
