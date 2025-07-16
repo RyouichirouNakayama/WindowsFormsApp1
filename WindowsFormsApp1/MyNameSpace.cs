@@ -30,6 +30,16 @@ namespace WindowsFormsApp1
             foreach (TypeDefinition type in this._types)
             {
                 make_class(type);
+
+                //foreach (var field in type.Fields)
+                //{
+                //    if (field.Name.EndsWith("k__BackingField"))
+                //    {
+                //        continue;
+                //    }
+                //    string typeName = get_typename(field.FieldType.Name, field.FieldType);
+                //    string name_field = get_var_field(field);
+                //}
             }
 
             foreach (MyNameSpace child in this._childs)
@@ -45,9 +55,58 @@ namespace WindowsFormsApp1
             aa.dicClasses[var_class_name] = true;
 
             string temp = $"var {var_class_name} = myBasicModelEditor.createClass({_FullNameSpace_RemoveDot}, \"{type.Name}\"); ";
+            aa.append(temp);
 
+
+
+            //クラスの可視性            
+            //入れ子クラスの可視性はひとまず考慮しない。
+            string visibility = "";
+            if ((type.Attributes & TypeAttributes.Public) == TypeAttributes.Public)
+            {
+                visibility = "public";
+            }
+            else
+            {
+                visibility = "package";
+            }
+
+            if ((type.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)
+            {
+                //このフラグの場合、インターフェースです。
+            }
+
+            temp = $"{var_class_name}.setVisibility(\"{visibility}\");";
             aa.append(temp);
         }
+
+
+
+        internal void _02check_class()
+        {
+            foreach (TypeDefinition type in this._types)
+            {
+                //foreach (var field in type.Fields)
+                //{
+                //    if (field.Name.EndsWith("k__BackingField"))
+                //    {
+                //        continue;
+                //    }
+                //    string typeName = get_typename(field.FieldType.Name, field.FieldType);
+                //    string name_field = get_var_field(field);
+                //}
+            }
+
+            foreach (MyNameSpace child in this._childs)
+            {
+                child._02check_class();
+            }
+        }
+
+
+
+
+
 
         internal void _02_make_fields()
         {
@@ -86,49 +145,50 @@ namespace WindowsFormsApp1
             return var_field;
         }
 
+        //string get_typename(TypeReference type)
+        //{
+
+
+        //    if (!aa.dicClasses.ContainsKey(type.FullName))
+        //    {
+
+        //    }
+
+
+        //}
+
 
         string get_typename(string arg,TypeReference type)
         {
+            string typeName = arg;           
 
-
-
-
-            string typeName = arg;
-            typeName = get_var_class(type);
-            if (!aa.dicClasses.ContainsKey(typeName))
+            switch (typeName)
             {
-                //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
-                typeName = $"\"{type.Name}\"";
+                case "Byte": typeName = "\"byte\""; break;
+                case "SByte": typeName = "\"sbyte\""; break;
+                case "Int16": typeName = "\"short\""; break;
+                case "UInt16": typeName = "\"ushort\""; break;
+                case "Int32": typeName = "\"int\""; break;
+                case "UInt32": typeName = "\"uint\""; break;
+                case "Int64": typeName = "\"long\""; break;
+                case "UInt64": typeName = "\"ulong\""; break;
+                case "String": typeName = "\"string\""; break;
+                case "Char": typeName = "\"char\""; break;
+                case "Boolean": typeName = "\"bool\""; break;
+                case "Single": typeName = "\"float\""; break;
+                case "Double": typeName = "\"double\""; break;
+                case "Object": typeName = "\"object\""; break;
+
+                default:
+                    //このアセンブリ内の自作クラスの場合はよいが
+                    typeName = get_var_class(type);
+                    if (!aa.dicClasses.ContainsKey(typeName))
+                    {
+                        //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
+                        typeName = $"\"{type.Name}\"";
+                    }
+                    break;
             }
-
-
-            //switch (typeName)
-            //{
-            //    case "Byte": typeName = "\"byte\""; break;
-            //    case "SByte": typeName = "\"sbyte\""; break;
-            //    case "Int16": typeName = "\"short\""; break;
-            //    case "UInt16": typeName = "\"ushort\""; break;
-            //    case "Int32": typeName = "\"int\""; break;
-            //    case "UInt32": typeName = "\"uint\""; break;
-            //    case "Int64": typeName = "\"long\""; break;
-            //    case "UInt64": typeName = "\"ulong\""; break;
-            //    case "String": typeName = "\"string\""; break;
-            //    case "Char": typeName = "\"char\""; break;
-            //    case "Boolean": typeName = "\"bool\""; break;
-            //    case "Single": typeName = "\"float\""; break;
-            //    case "Double": typeName = "\"double\""; break;
-            //    case "Object": typeName = "\"object\""; break;
-
-            //    default:
-            //        //このアセンブリ内の自作クラスの場合はよいが
-            //        typeName = get_var_class(type);
-            //        if (!aa.dicClasses.ContainsKey(typeName))
-            //        {
-            //            //CLR標準ライブラリなど他のアセンブリで宣言しているクラスの場合
-            //            typeName = $"\"{type.Name}\"";
-            //        }
-            //        break;
-            //}
             return typeName;
         }
 
@@ -182,11 +242,11 @@ namespace WindowsFormsApp1
                     $"{var_class_name},\"{pro.Name}\",{kata}); ";
                 aa.append(temp);
 
-                temp = $"{var_name}.setVisibility(\"public\");";
-                aa.append(temp);
+                //temp = $"{var_name}.setVisibility(\"public\");";
+                //aa.append(temp);
 
-                temp = $"{var_name}.addStereotype(\"property\");";
-                aa.append(temp);
+                //temp = $"{var_name}.addStereotype(\"property\");";
+                //aa.append(temp);
             }
 
             //Console.WriteLine("------------メソッド------------");

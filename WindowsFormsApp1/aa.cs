@@ -9,7 +9,7 @@ namespace WindowsFormsApp1
     internal static class aa
     {
         static StringBuilder sb = new StringBuilder();
-        internal static void init_sb() { sb = new StringBuilder(); }
+        internal static void clear_sb() { sb.Clear(); }
         internal static string get_sb() { return sb.ToString(); }
         internal static void append(string arg)
         {
@@ -18,5 +18,8 @@ namespace WindowsFormsApp1
         }
 
         internal static Dictionary<string, bool> dicClasses = new Dictionary<string, bool>();
+
+        internal static Dictionary<string, bool> needClasses = new Dictionary<string, bool>();
+
     }
 }

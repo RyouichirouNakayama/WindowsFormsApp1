@@ -36,16 +36,15 @@ namespace WindowsFormsApp1
             }
 
             string[] files = Directory.GetFiles(dir,//ReactiveProperty
-                "*.csproj",
-                SearchOption.AllDirectories);
+                "*.csproj", SearchOption.AllDirectories);
 
-            ParseCSProject parseCSProject = new ParseCSProject();
+            bb parseCSProject = new bb();
 
             foreach (string file in files)
             {
                 try
-                {                   
-                    parseCSProject.Start(file);
+                {
+                    parseCSProject.start2(file);
                 }
                 catch
                 {
@@ -53,10 +52,7 @@ namespace WindowsFormsApp1
                 }
             }
 
-            this.Shown += (e1,e2) => this.Close();
-        }
-
-
-        
+            this.Shown += (e1, e2) => this.Close();
+        }        
     }
 }

@@ -80,7 +80,7 @@
   <ItemGroup>
     <Compile Include="aa.cs" />
     <Compile Include="MyNameSpace.cs" />
-    <Compile Include="ParseCSProject.cs" />
+    <Compile Include="bb.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
